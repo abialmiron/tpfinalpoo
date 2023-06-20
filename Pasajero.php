@@ -92,7 +92,7 @@ class Pasajero{
 	 * @param int $dni
 	 * @return true en caso de encontrar los datos, false en caso contrario 
 	 */		
-    public function Buscar($dni){
+    public function buscar($dni){
 		$base=new BaseDatos();
 		$consultaPasajero="Select * from pasajero where pdocumento=".$dni;
 		$resp= false;
@@ -171,7 +171,7 @@ class Pasajero{
 					$idViaje=$row2['idviaje'];
 				
 					$pasaj=new Pasajero();
-					$pasaj->cargar($row2);
+					$pasaj->cargar($nrodoc, $nombre, $apellido, $idViaje, $telefono);
 					array_push($arregloPasajeros,$pasaj);
 	
 				}

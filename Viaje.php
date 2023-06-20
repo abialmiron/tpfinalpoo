@@ -13,14 +13,25 @@ class Viaje{
     private $mensajeOperacion;
 
     /************* Metodo constructor *************/
-    public function __construct($codviaje, $des, $cantmaxpasajeros, $pas,$res,$cos,$emp){
-        $this->cod_viaje = $codviaje;
+    public function __construct(){
+        $this->cod_viaje = 0;
+        $this->destino = '';
+        $this->cantMaximaPasajeros = 0;
+        $this->pasajeros = 0;
+        $this->responsable = 0;
+        $this->costo = 0;
+        $this->empresa = 0;
+    }
+
+    public function cargar($codViaje,$des, $cantmaxpasajeros, $pas,$res,$cos,$emp){
+        $this->cod_Viaje = $codViaje;
         $this->destino = $des;
         $this->cantMaximaPasajeros = $cantmaxpasajeros;
         $this->pasajeros = $pas;
         $this->responsable = $res;
         $this->costo = $cos;
         $this->empresa = $emp;
+
     }
 
     /*************** SETTERS Y GETTERS ********************/
@@ -122,21 +133,9 @@ class Viaje{
 
     public function traePasajeros(){
         $pasajero = new Pasajero();
-        $condicion = "idViaje =".$this->getCodViaje();
+        $condicion = "idviaje =".$this->getCodViaje();
         $colPasajeros = $pasajero->listar($condicion);
         $this->setPasajeros($colPasajeros);
-    }
-
-    /** Este método se encarga de mostrar la colección de pasajeros de una forma mas entendible.
-     *  @return string $mensaje
-     */
-    public function mostrarPasajeros(){
-        $mensaje = '';
-        $colPasajeros = $this->getPasajeros();
-        for ($i=0;$i < count($colPasajeros); $i++){
-            $mensaje .= '---------------' . "\n" . $colPasajeros[$i] . "\n";
-        }
-        return $mensaje;
     }
 
     public function venderPasaje($objPasajero){
@@ -172,7 +171,7 @@ class Viaje{
 	 * @param int $dni
 	 * @return true en caso de encontrar los datos, false en caso contrario 
 	 */		
-    public function Buscar($codviaje){
+    public function buscar($codviaje){
 		$base=new BaseDatos();
 		$consultaViaje="Select * from viaje where idviaje=".$codviaje;
 		$resp= false;
@@ -183,16 +182,24 @@ class Viaje{
 				    $this->setDestino($row2['vdestino']);
 					$this->setCantMaximaPasajeros($row2['vcantmaxpasajeros']);
 					$this->setCosto($row2['vimporte']);
-					$this->setEmail($row2['email']);
+                    //$objPasajero = new Pasajero();
+                    $colPasajeros = Pasajero::listar('idviaje ='.$codviaje);
+					$this->setPasajeros($colPasajeros);
+                    $objEmpresa = new Empresa();
+                    $empresa = $objEmpresa->buscar($row2['idempresa']);
+                    $this->setEmpresa($empresa);
+                    $objResponsable = new ResponsableV();
+                    $responsable = $objResponsable->buscar($row2['rnumeroempleado']);
+                    $this->setResponsable($responsable);
 					$resp= true;
 				}				
 			
 		 	}	else {
-		 			$this->setmensajeoperacion($base->getError());
+		 			$this->setMensajeOperacion($base->getError());
 		 		
 			}
 		 }	else {
-		 		$this->setmensajeoperacion($base->getError());
+		 		$this->setMensajeOperacion($base->getError());
 		 	
 		 }		
 		 return $resp;
@@ -200,16 +207,15 @@ class Viaje{
 
     public function insertar(){
 		$base=new BaseDatos();
-		$resp= false;
-		$consultaInsertar="INSERT INTO viaje(idviaje, vdestino, vcantmaxpasajeros, idempresa, rnumeroempleado,vimporte)
-				VALUES (".$this->getCodViaje().",'".$this->getDestino()."','".$this->getCantMaximaPasajeros()."',". $this->getEmpresa()->getIdEmpresa(). ",'".$this->getResponsable()->getNumEmpleado()."','".$this->getCosto()."')";
+		$resp= null;
+		$consultaInsertar="INSERT INTO viaje(vdestino, vcantmaxpasajeros, idempresa, rnumeroempleado,vimporte)
+				VALUES ('".$this->getDestino()."',".$this->getCantMaximaPasajeros().",". $this->getEmpresa()->getIdEmpresa(). ",".$this->getResponsable()->getNumEmpleado().",".$this->getCosto().");";
 		
 		if($base->Iniciar()){
-
-			if($base->Ejecutar($consultaInsertar)){
-
-			    $resp=  true;
-
+            $id = $base->devuelveIDInsercion($consultaInsertar);
+			if($id != null){
+			    $resp=  $id;
+                $this->setCodViaje($id);
 			}	else {
 					$this->setMensajeOperacion($base->getError());
 					
@@ -222,7 +228,37 @@ class Viaje{
 		return $resp;
 	}
 
-    
+    /**
+	 * Lista a los pasajeros, se le puede pasar una condición para filtrar la lista
+     * @param string $condicion
+	 * @return $arregloPasajeros
+	 */	
+    public static function listar($condicion=""){
+	    $arregloViajes = null;
+		$base=new BaseDatos();
+		$consultaViajes="Select * from viaje";
+		if ($condicion!=""){
+		    $consultaViajes=$consultaViajes.' where '.$condicion;
+		}
+		$consultaViajes.=" order by vdestino ";
+		if($base->Iniciar()){
+			if($base->Ejecutar($consultaViajes)){				
+				$arregloViajes= array();
+				while($row2=$base->Registro()){
+                    $objViaje = new Viaje();
+                    $objViaje->buscar($row2['idviaje']);
+                    array_push($arregloViajes,$objViaje);
+				}
+		 	}	else {
+		 			$this->setMensajeOperacion($base->getError());
+		 		
+			}
+		 }	else {
+		 		$this->setMensajeOperacion($base->getError());
+		 	
+		 }	
+		 return $arregloViajes;
+	}	
 
     public function __toString(){
         $mensaje = $this->mostrarPasajeros();
@@ -231,7 +267,7 @@ class Viaje{
         "Cantidad máxima de pasajeros: " . $this->getCantMaximaPasajeros() . "\n".
         "Costo: " . $this->getCosto() . "\n" . 
         "Suma de costos: " . $this->getSumCosto() . "\n" . 
-        "Empresa: " . $this->getIdEmpresa() . "\n" .
+        "Empresa: " . $this->getEmpresa() . "\n" .
         "Responsable: " . "\n" .$this->getResponsable() . "\n" . 
         $mensaje;
     }   

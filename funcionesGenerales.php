@@ -38,6 +38,44 @@ function verificaIngresoNumerico($stringAMostrar, $min,$max){
     return $respuesta;
 }
    
+/*Esta función se encarga de que el DNI a cargar no se encuentre ya en el arreglo
+    @param array $pasajeros son los pasajeros ya cargados
+    @return int $dniPasajero */
+    function verificaDNI($pasajeros){
+        do{
+            $ciclo = false;
+            echo 'Ingrese el DNI del pasajero: ' . "\n";
+            $dniPasajero = trim(fgets(STDIN));
+            if (!is_int($dniPasajero)){
+                //Verifica si se ingresó un dato de 7 u 8 numeros
+                if (verificaFormatoDNI($dniPasajero)){
+                    echo 'El DNI ingresado es invalido, intente nuevamente' . "\n";
+                    $ciclo = true;
+                } else {
+                    //Verifica si el pasajero ya fueron pedidos por consola pero no ingresados todavía, para no repetir registros
+                    $existe = recorrePasajeros($dniPasajero,$pasajeros);
+                    if ($existe){
+                        echo 'El DNI ingresado ya se encontraba cargado, intente con otro'. "\n";
+                        $ciclo = true;
+                    }
+                    }
+            } else {
+                echo 'No se ingresó un DNI valido, intente nuevamente'. "\n";
+                $ciclo = true;
+            }
+        }while($ciclo);
+        return $dniPasajero;
+    }
+    
+    function recorrePasajeros($dniPasajero,$pasajeros){
+        $i = 0;
+        $encontro = false;
+        while($i < count($pasajeros) && !$encontro){
+            $encontro = $pasajeros[$i]->getDni() == $dniPasajero;
+            $i++;
+        }
+        return $encontro;
+    }
 /** Esta función se encarga de preguntarle al usuario si quiere ingresar
 *   otro pasajero y para cuando recibe una respuesta valida.
 *  @return boolean $ingresoUsuario 

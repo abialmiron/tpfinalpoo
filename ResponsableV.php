@@ -6,7 +6,14 @@ class ResponsableV{
     private $apellido;
     private $mensajeOperacion;
 
-    public function __construct($numEmp, $numLic, $nom, $ape){
+    public function __construct(){
+        $this->numEmpleado = '';
+        $this->numLicencia = '';
+        $this->nombre = '';
+        $this->apellido = '';
+    }
+
+    public function cargar($numEmp, $numLic, $nom, $ape){
         $this->numEmpleado = $numEmp;
         $this->numLicencia = $numLic;
         $this->nombre = $nom;
@@ -47,15 +54,14 @@ class ResponsableV{
     public function insertar(){
 		$base=new BaseDatos();
 		$resp= false;
-		$consultaInsertar="INSERT INTO responsablev(rnumeroempleado, rnumerolicencia, rnombre,rapellido)
-				VALUES (".$this->getNumEmpleado().",'".$this->getNumLicencia()."','".$this->getNombre()."','".$this->getApellido()."')";
+		$consultaInsertar="INSERT INTO responsablev(rnumerolicencia, rnombre,rapellido)
+				VALUES (".$this->getNumLicencia().",'".$this->getNombre()."','".$this->getApellido()."')";
 		
 		if($base->Iniciar()){
-
-			if($base->Ejecutar($consultaInsertar)){
-
-			    $resp=  true;
-
+            $id = $base->devuelveIDInsercion($consultaInsertar);
+			if($id != null){
+			    $resp=  $id;
+                $this->setNumEmpleado($id);
 			}	else {
 					$this->setMensajeOperacion($base->getError());
 					
@@ -67,6 +73,31 @@ class ResponsableV{
 		}
 		return $resp;
 	}
+
+    public function buscar($numEmpleado){
+		$base=new BaseDatos();
+		$consultaResp="Select * from responsablev where rnumeroempleado=".$numEmpleado;
+		$resp= false;
+		if($base->Iniciar()){
+			if($base->Ejecutar($consultaResp)){
+				if($row2=$base->Registro()){
+				    $this->setNumEmpleado($numEmpleado);
+				    $this->setNumLicencia($row2['rnumerolicencia']);
+					$this->setNombre($row2['rnombre']);
+					$this->setApellido($row2['rapellido']);
+					$resp= true;
+				}				
+			
+		 	}	else {
+		 			$this->setMensajeOperacion($base->getError());
+		 		
+			}
+		 }	else {
+		 		$this->setMensajeOperacion($base->getError());
+		 	
+		 }		
+		 return $resp;
+	}	
 
     public function __toString(){
         return 'Número de empleado: '. $this->getNumEmpleado() . "\n". 
