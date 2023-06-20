@@ -26,7 +26,7 @@ function menu_principal(){
 }
 
 function ingresa_empresa(){
-    $mensaje = "Desea trabajar con una empresa ya cargada o quiere ingresar una nueva?";
+    $mensaje = "Desea seleccionar una empresa ya cargada o quiere ingresar una nueva?";
     $mensaje .= "\n 1) Ya cargada";
     $mensaje .= "\n 2) Ingresar nueva \n";
 
@@ -42,11 +42,14 @@ function ingresa_empresa(){
                 $arregloID[] = $colEmpresas[$i]->getIdEmpresa();
                 echo $colEmpresas[$i];
             }
-
+            do{
             $idEmpresa = verificaIngreso("Ingrese el ID de la empresa con la que quiere trabajar: \n ");
-            //if($arregloID)
+            $verificaID = array_search($idEmpresa,$arregloID) === false;
+            }while($verificaID);
+
             $empresaSeleccionada = new Empresa();
             $empresaSeleccionada->buscar($idEmpresa);
+
             break;
         case 2:
             $nombre = verificaIngreso("Ingrese el nombre de la empresa nueva: \n");
@@ -63,14 +66,18 @@ function ingresa_empresa(){
 
 }
 
-function cargaViaje(){
+function cargaViaje($objEmpresa){
     $des = verificaIngreso("Ingrese el destino:\n");
     $cantMaxPasajeros = verificaIngreso("Ingrese la cantidad máxima de pasajeros:\n");
     $costo  = verificaIngreso("Ingrese el costo del viaje: \n");
     $objResponsable = cargaResponsable();
 
     $objViaje = new Viaje();
-    $objViaje->cargar(0,$des,$cantMaxPasajeros,[],$objResponsable,$costo,$empresa);
+    $objViaje->cargar(0,$des,$cantMaxPasajeros,[],$objResponsable,$costo,$objEmpresa);
+    $objViaje->insertar();
+
+    $colPasajeros = cargaPasajerosInicial($objViaje);
+    $objViaje->setPasajeros($colPasajeros);
     
 }
 
@@ -88,20 +95,60 @@ function cargaResponsable(){
 
 /** Esta función se encarga de realizar la carga inicial de un viaje.
  */
-function cargaPasajerosInicial(){
+function cargaPasajerosInicial($objViaje){
     $colPasajeros = array();
+    $contador = 0;
     do{
+        $contador += 1;
         $dni = verificaDNI($colPasajeros);
         $nombre = verificaIngreso("Ingrese el nombre del nuevo pasajero: \n");
         $apellido = verificaIngreso("Ingrese el apellido: \n");
         $telefono = verificaIngreso("Ingrese el telefono: \n");
 
         $objPasajero = new Pasajero();
-        $objPasajero->cargar($dni,$nombre,$apellido,$idViaje, $telefono);
+        $objPasajero->cargar($dni,$nombre,$apellido,$objViaje->getCodViaje(), $telefono);
+        $objPasajero->insertar();
 
+        array_push($colPasajeros,$objPasajero);
+        $objViaje->venderPasaje();
         $respuesta = pregunta();
-    }while($respuesta);
+    }while($respuesta && $contador < $objViaje->getCantMaximaPasajeros());
+    return $colPasajeros;
 }
+
+function listaViajes($objEmpresa){
+    $colViajes = Viaje::listar("idempresa = ".$objEmpresa->getIdEmpresa());
+    for($i = 0;$i < count($colViajes);$i++){
+        echo $colViajes[$i];
+    }
+}
+
+function modificarViaje($objEmpresa){
+    $colViajes = Viaje::listar("idempresa = ".$objEmpresa->getIdEmpresa());
+    for($i = 0;$i < count($colViajes);$i++){
+        $arrCodViajes[] = $colViajes[$i]->getCodViaje();
+        echo $colViajes[$i];
+    }
+
+    do{
+        $codViaje = verificaIngreso("Ingrese el codViaje del viaje con el que quiere trabajar: \n ");
+        $verificaID = array_search($arrCodViajes,$codViaje) === false;
+    }while($verificaID);
+
+    $objViaje = new Viaje();
+    $objViaje->buscar($codViaje);
+
+    $mensaje = "¿Qué desea modificar del viaje? \n";
+    $mensaje .= "1) Destino \n";
+    $mensaje .= "2) Cantidad Máxima de pasajeros \n";
+    $mensaje .= "3) Asignar otro responsable al viaje \n";
+    $mensaje .= "4) Cambiar la empresa \n";
+    $mensaje .= "5) Costo \n";
+
+    $modificacion = verificaIngresoNumerico($mensaje, 1,5);
+
+}
+
 
 /** MENU PRINCIPAL */
 
@@ -112,22 +159,17 @@ $ingresoUsuario = menu_principal();
 switch($ingresoUsuario){
     case 1: 
         echo "Bienvenido a la carga de un nuevo viaje \n";
-        cargaViaje();
+        cargaViaje($objEmpresa);
+    break;
+    case 2: 
+        echo "Se listan todos los viajes creados: \n";
+        listaViajes($objEmpresa);
+    break;
+    case 3:
+        echo "Se muestran los viajes almacenados: \n";
+        listaViajes($objEmpresa);
+        modificarViaje($objEmpresa);
     break;
 }
-
-/*$empresa = new Empresa(); 
-$empresa->cargar(1,'prueba','av argentina 2', []);
-$responsable = new ResponsableV();
-$responsable->cargar(1, 2, 'Silvia', 'Ortiz');
-$viaje = new Viaje();
-$viaje->cargar(1,'paraguay', 32, [] ,$responsable,2292,$empresa);
-
-$respuesta = $viaje->insertar();
-echo $respuesta;
-if ($respuesta != null) {
-    echo "\nOP INSERCION;  El Viaje fue ingresada en la BD";
-}else 
-echo $viaje->getMensajeOperacion();*/
 
 ?>

@@ -82,10 +82,6 @@ class Pasajero{
         return $this->mensajeOperacion;
     }
     
-    public function darPorcentajeIncremento(){
-        $incremento = 10;
-        return $incremento;
-    }
 
     /**
 	 * Recupera los datos de un pasajero por dni

@@ -127,6 +127,18 @@ class Viaje{
 
     /************ METODOS PROPIOS DE LA CLASE ************/
 
+     /** Este método se encarga de mostrar la colección de pasajeros de una forma mas entendible.
+     *  @return string $mensaje
+     */
+    public function mostrarPasajeros(){
+        $mensaje = '';
+        $colPasajeros = $this->getPasajeros();
+        for ($i=0;$i < count($colPasajeros); $i++){
+            $mensaje .= '---------------' . "\n" . $colPasajeros[$i] . "\n";
+        }
+        return $mensaje;
+    }
+    
     /** Este método se encarga de traer los datos de la bd de los pasajeros relacionados con el viaje
      * y setearlos en el atributo pasajeros.
      */
@@ -138,32 +150,12 @@ class Viaje{
         $this->setPasajeros($colPasajeros);
     }
 
-    public function venderPasaje($objPasajero){
-        $colPasajeros = $this->getPasajeros();
+    public function venderPasaje(){
         $cos = $this->getCosto();
         $sumCosto = $this->getSumCosto();
-        
-        if($this->hayPasajesDisponible()){
-            $colPasajeros[] = $objPasajero;
-            $incremento = $objPasajero->darPorcentajeIncremento();
-            $costoFinal = $cos + (($cos * $incremento)/100); 
-        }
-        $sumCosto = $sumCosto + $costoFinal;
-        $this->setSumCosto($sumCosto);
-        $this->setPasajeros($colPasajeros);
-        return $costoFinal;
-    }
 
-    public function hayPasajesDisponible(){
-        $cantMax = $this->getCantMaximaPasajeros();
-        $colPasajeros = $this->getPasajeros();
-        $longitud = count($colPasajeros);
-        if($longitud < $cantMax){
-            $hayPasajes = true;
-        } else { 
-            $hayPasajes = false;
-        }
-        return $hayPasajes;
+        $sumCosto = $sumCosto + $cos;
+        $this->setSumCosto($sumCosto);
     }
 
     /**
