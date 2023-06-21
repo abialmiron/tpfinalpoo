@@ -4,7 +4,7 @@ class Pasajero{
     private $apellido;
     private $dni;
     private $telefono;
-    private $idViaje;
+    private $objViaje;
     private $mensajeOperacion;
 
     /******* CONSTRUCTOR *******/
@@ -12,15 +12,15 @@ class Pasajero{
         $this->dni = 0;
         $this->nombre = '';
         $this->apellido = '';
-        $this->idViaje = 0;
+        $this->objViaje = 0;
         $this->telefono = 0;
     }
 
-    public function cargar($dniCargar, $nombreCargar, $apellidoCargar, $idViajeCargar, $telefonoCargar){
+    public function cargar($dniCargar, $nombreCargar, $apellidoCargar, $objViaje, $telefonoCargar){
         $this->dni = $dniCargar;
         $this->nombre = $nombreCargar;
         $this->apellido = $apellidoCargar;
-        $this->idViaje = $idViajeCargar;
+        $this->objViaje = $objViaje;
         $this->telefono = $telefonoCargar;
 
     }
@@ -68,11 +68,11 @@ class Pasajero{
     public function getTelefono(){
         return $this->telefono;
     }
-    public function setIdViaje($nuevoIdViaje){
-        $this->idViaje = $nuevoIdViaje;
+    public function setObjViaje($nuevoObjViaje){
+        $this->objViaje = $nuevoObjViaje;
     }
-    public function getIdViaje(){
-        return $this->idViaje;
+    public function getObjViaje(){
+        return $this->objViaje;
     }
 
     public function setMensajeOperacion($nuevoMensaje){
@@ -99,7 +99,9 @@ class Pasajero{
 					$this->setNombre($row2['pnombre']);
 					$this->setApellido($row2['papellido']);
 					$this->setTelefono($row2['ptelefono']);
-                    $this->setIdViaje($row2['idviaje']);
+                    $objViaje = new Viaje();
+                    $objViaje->buscar($row2['idviaje']);
+                    $this->setObjViaje($objViaje);
 					$resp= true;
 				}				
 			
@@ -123,7 +125,7 @@ class Pasajero{
 		$base=new BaseDatos();
 		$resp= false;
 		$consultaInsertar="INSERT INTO pasajero(pdocumento, pnombre, papellido, ptelefono, idviaje)
-				VALUES (".$this->getDni().",'".$this->getNombre()."','".$this->getApellido()."',". $this->getTelefono(). ",'".$this->getIdViaje()."')";
+				VALUES (".$this->getDni().",'".$this->getNombre()."','".$this->getApellido()."',". $this->getTelefono(). ",'".$this->getObjViaje()->getCodViaje()."')";
 		
 		if($base->Iniciar()){
 
@@ -164,10 +166,11 @@ class Pasajero{
 					$nombre=$row2['pnombre'];
 					$apellido=$row2['papellido'];
 					$telefono=$row2['ptelefono'];
-					$idViaje=$row2['idviaje'];
+                    $objViaje = new Viaje();
+                    $objViaje->buscar($row2['idviaje']);
 				
 					$pasaj=new Pasajero();
-					$pasaj->cargar($nrodoc, $nombre, $apellido, $idViaje, $telefono);
+					$pasaj->cargar($nrodoc, $nombre, $apellido, $objViaje, $telefono);
 					array_push($arregloPasajeros,$pasaj);
 	
 				}
@@ -184,12 +187,50 @@ class Pasajero{
 		 return $arregloPasajeros;
 	}	
 
+    public function modificar(){
+	    $resp =false; 
+	    $base=new BaseDatos();
+		$consultaModifica="UPDATE pasajero SET pnombre='".$this->getNombre()."',papellido='".$this->getApellido()."'
+                           ,ptelefono=".$this->getTelefono().",idviaje=". $this->getObjViaje()->getCodViaje()." WHERE pdocumento =".$this->getDni();
+		if($base->Iniciar()){
+			if($base->Ejecutar($consultaModifica)){
+			    $resp=  true;
+			}else{
+				$this->setMensajeOperacion($base->getError());
+				
+			}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp;
+	}
+	
+	public function eliminar(){
+		$base=new BaseDatos();
+		$resp=false;
+		if($base->Iniciar()){
+				$consultaBorra="DELETE FROM pasajero WHERE pdocumento=".$this->getDni();
+				if($base->Ejecutar($consultaBorra)){
+				    $resp=  true;
+				}else{
+						$this->setMensajeOperacion($base->getError());
+					
+				}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp; 
+	}
+
+
     public function __toString(){
         return 'DNI: ' . $this->getDni() . "\n" . 
         'Nombre: ' . $this->getNombre() . "\n" . 
         'Apellido: ' . $this->getApellido(). "\n" . 
         'Telefono: ' . $this->getTelefono() . "\n" .
-        'Id viaje: ' . $this->getIdViaje() . "\n";
+        'Viaje: ' . $this->getObjViaje() . "\n";
     }
 
 }

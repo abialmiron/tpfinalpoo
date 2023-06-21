@@ -252,6 +252,44 @@ class Viaje{
 		 return $arregloViajes;
 	}	
 
+    
+	public function modificar(){
+	    $resp =false; 
+	    $base=new BaseDatos();
+		$consultaModifica="UPDATE viaje SET vdestino='".$this->getDestino()."',vcantmaxpasajeros=".$this->getCantMaximaPasajeros()."
+                           ,idempresa=".$this->getEmpresa()->getIdEmpresa().",rnumeroempleado=". $this->getResponsable()->getNumEmpleado().",vimporte=" .$this->getCosto() ." WHERE idviaje =".$this->getCodViaje();
+		if($base->Iniciar()){
+			if($base->Ejecutar($consultaModifica)){
+			    $resp=  true;
+			}else{
+				$this->setMensajeOperacion($base->getError());
+				
+			}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp;
+	}
+	
+	public function eliminar(){
+		$base=new BaseDatos();
+		$resp=false;
+		if($base->Iniciar()){
+				$consultaBorra="DELETE FROM viaje WHERE idviaje=".$this->getCodViaje();
+				if($base->Ejecutar($consultaBorra)){
+				    $resp=  true;
+				}else{
+						$this->setMensajeOperacion($base->getError());
+					
+				}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp; 
+	}
+
     public function __toString(){
         $mensaje = $this->mostrarPasajeros();
         return "Código de viaje: " . $this->getCodViaje() . "\n".  

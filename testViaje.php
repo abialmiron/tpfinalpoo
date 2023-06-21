@@ -118,17 +118,25 @@ function cargaPasajerosInicial($objViaje){
 
 function listaViajes($objEmpresa){
     $colViajes = Viaje::listar("idempresa = ".$objEmpresa->getIdEmpresa());
-    for($i = 0;$i < count($colViajes);$i++){
-        echo $colViajes[$i];
-    }
-}
-
-function modificarViaje($objEmpresa){
-    $colViajes = Viaje::listar("idempresa = ".$objEmpresa->getIdEmpresa());
+    $arrCodViajes = array();
     for($i = 0;$i < count($colViajes);$i++){
         $arrCodViajes[] = $colViajes[$i]->getCodViaje();
         echo $colViajes[$i];
     }
+}
+
+function listaResponsables(){
+    $respArray = array();
+    $colResp = ResponsableV::listar();
+    for($i = 0;$i < count($colResp);$i++){
+        $respArray[] = $colResp[$i]->getNumEmpleado();
+        echo $colResp[$i];
+    }
+    return $respArray;
+}
+
+function modificarViaje($objEmpresa){
+    $arrCodViajes = listaViajes($objEmpresa);
 
     do{
         $codViaje = verificaIngreso("Ingrese el codViaje del viaje con el que quiere trabajar: \n ");
@@ -147,8 +155,63 @@ function modificarViaje($objEmpresa){
 
     $modificacion = verificaIngresoNumerico($mensaje, 1,5);
 
+    switch($modificacion){
+        case 1: 
+            $destinoNuevo = verificaIngreso("Ingrese el nuevo destino: \n");
+            $objViaje->setDestino($destinoNuevo);
+            $objViaje->modificar();
+            break;
+        case 2:
+            $cantMaxNueva = verificaIngreso("Ingrese la cantidad máxima de pasajeros nueva: \n");
+            $objViaje->setCantMaximaPasajeros($cantMaxNueva);
+            $objViaje->modificar();
+            break;
+        case 3:
+            $respuestaUsuario = verificaIngresoNumerico("¿Desea seleccionar un responsable ya cargado o uno nuevo? \n 1) Ya cargado \n 2) Crear nuevo \n",1,2);
+            if($respuestaUsuario == 1){
+            echo "Lista de responsables cargados: ";
+            $respArray = listaResponsables();
+            do{
+                $numEmpleadoNuevo = verificaIngreso("Ingrese el Num empleado del responsable que desea asignar al viaje: \n ");
+                $verificaID = array_search($respArray,$numEmpleadoNuevo) === false;
+            }while($verificaID);
+            $objResponsable = new Responsable();
+            $objResponsable->buscar($numEmpleadoNuevo);
+            $objViaje->setResponsable($objResponsable);
+            $objResponsable->modificar();
+            } else {
+                $objResponsable = cargaResponsable();
+                $objViaje->setResponsable($objResponsable);
+                $objResponsable->modificar();
+            }
+            break;
+        case 4: 
+            $nuevaEmpresa = ingresa_empresa();
+            $objViaje->setEmpresa($nuevaEmpresa);
+            $objViaje->modificar();
+        break;
+        case 5:
+            $nuevoCosto = verificaIngreso("Ingrese el nuevo costo: ");
+            $objViaje->setCosto($nuevoCosto);
+            $objViaje->modificar();
+        break;
+    }
+
 }
 
+function eliminaViaje($codViaje){
+    $objViaje = new Viaje();
+    $objViaje->buscar($codViaje);
+    $objViaje->traerPasajeros();
+    $colPasajeros = $objViaje->getPasajeros();
+
+    for($i=0;$i<count($colPasajeros);$i++){
+        $objPasajero = $colPasajeros[$i];
+        $objPasajero->eliminar();
+    }
+
+    $objViaje->eliminar();
+}
 
 /** MENU PRINCIPAL */
 
@@ -163,12 +226,21 @@ switch($ingresoUsuario){
     break;
     case 2: 
         echo "Se listan todos los viajes creados: \n";
-        listaViajes($objEmpresa);
+        $arrCodViajes = listaViajes($objEmpresa);
     break;
     case 3:
         echo "Se muestran los viajes almacenados: \n";
-        listaViajes($objEmpresa);
         modificarViaje($objEmpresa);
+    break;
+    case 4:
+        echo "Se muestran los viajes almacenados: \n";
+        $arrCodViajes = listaViajes($objEmpresa);
+        do{
+            $codViaje = verificaIngreso("Ingrese el codViaje del viaje que desea eliminar: \n ");
+            $verificaID = array_search($arrCodViajes,$codViaje) === false;
+        }while($verificaID);
+
+        eliminaViaje($codViaje);
     break;
 }
 

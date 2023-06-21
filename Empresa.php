@@ -139,5 +139,42 @@ class Empresa{
 		 return $arregloEmp;
 	}	
 
+	public function modificar(){
+	    $resp =false; 
+	    $base=new BaseDatos();
+		$consultaModifica="UPDATE empresa SET enombre='".$this->getNombre()."',edireccion='".$this->getDireccion()."'
+                           "." WHERE idempresa =".$this->getIdEmpresa();
+		if($base->Iniciar()){
+			if($base->Ejecutar($consultaModifica)){
+			    $resp=  true;
+			}else{
+				$this->setMensajeOperacion($base->getError());
+				
+			}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp;
+	}
+	
+	public function eliminar(){
+		$base=new BaseDatos();
+		$resp=false;
+		if($base->Iniciar()){
+				$consultaBorra="DELETE FROM empresa WHERE idempresa=".$this->getIdEmpresa();
+				if($base->Ejecutar($consultaBorra)){
+				    $resp=  true;
+				}else{
+						$this->setMensajeOperacion($base->getError());
+					
+				}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp; 
+	}
+
 }
 ?>

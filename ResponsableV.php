@@ -99,6 +99,43 @@ class ResponsableV{
 		 return $resp;
 	}	
 
+    public function modificar(){
+	    $resp =false; 
+	    $base=new BaseDatos();
+		$consultaModifica="UPDATE responsablev SET rnumerolicencia=".$this->getNumLicencia().",rnombre='".$this->getNombre()."'
+                           ,rapellido='".$this->getApellido()."'"." WHERE rnumeroempleado =".$this->getNumEmpleado();
+		if($base->Iniciar()){
+			if($base->Ejecutar($consultaModifica)){
+			    $resp=  true;
+			}else{
+				$this->setMensajeOperacion($base->getError());
+				
+			}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp;
+	}
+	
+	public function eliminar(){
+		$base=new BaseDatos();
+		$resp=false;
+		if($base->Iniciar()){
+				$consultaBorra="DELETE FROM responsablev WHERE rnumeroempleado=".$this->getNumEmpleado();
+				if($base->Ejecutar($consultaBorra)){
+				    $resp=  true;
+				}else{
+						$this->setMensajeOperacion($base->getError());
+					
+				}
+		}else{
+				$this->setMensajeOperacion($base->getError());
+			
+		}
+		return $resp; 
+	}
+
     public function __toString(){
         return 'Número de empleado: '. $this->getNumEmpleado() . "\n". 
         'Número de licencia: ' . $this->getNumLicencia() . "\n". 
