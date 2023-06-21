@@ -95,13 +95,9 @@ class Pasajero{
 		if($base->Iniciar()){
 			if($base->Ejecutar($consultaPasajero)){
 				if($row2=$base->Registro()){
-				    $this->setDni($dni);
-					$this->setNombre($row2['pnombre']);
-					$this->setApellido($row2['papellido']);
-					$this->setTelefono($row2['ptelefono']);
                     $objViaje = new Viaje();
                     $objViaje->buscar($row2['idviaje']);
-                    $this->setObjViaje($objViaje);
+					$this->cargar($dni,$row2['pnombre'],$row2['papellido'],$objViaje,$row2['ptelefono']);
 					$resp= true;
 				}				
 			

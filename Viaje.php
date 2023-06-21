@@ -172,16 +172,11 @@ class Viaje{
 		if($base->Iniciar()){
 			if($base->Ejecutar($consultaViaje)){
 				if($row2=$base->Registro()){
-				    $this->setCodViaje($codviaje);
-				    $this->setDestino($row2['vdestino']);
-					$this->setCantMaximaPasajeros($row2['vcantmaxpasajeros']);
-					$this->setCosto($row2['vimporte']);
                     $objEmpresa = new Empresa();
                     $objEmpresa->buscar($row2['idempresa']);
-                    $this->setEmpresa($objEmpresa);
                     $objResponsable = new ResponsableV();
                     $objResponsable->buscar($row2['rnumeroempleado']);
-                    $this->setResponsable($objResponsable);
+                    $this->cargar($codviaje,$row2['vdestino'],$row2['vcantmaxpasajeros'],[],$objResponsable,$row2['vimporte'],$objEmpresa);
 					$resp= true;
 				}				
 			
@@ -231,7 +226,7 @@ class Viaje{
 		if ($condicion!=""){
 		    $consultaViajes=$consultaViajes.' where '.$condicion;
 		}
-		$consultaViajes.=" order by vdestino ";
+		$consultaViajes.=" order by idviaje ";
 		if($base->Iniciar()){
 			if($base->Ejecutar($consultaViajes)){				
 				$arregloViajes= array();

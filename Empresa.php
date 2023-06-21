@@ -60,11 +60,7 @@ class Empresa{
 		if($base->Iniciar()){
 			if($base->Ejecutar($consultaEmpresa)){
 				if($row2=$base->Registro()){
-				    $this->setIdEmpresa($idEmpresa);
-					$this->setNombre($row2['enombre']);
-					$this->setDireccion($row2['edireccion']);
-
-                    
+					$this->cargar($idEmpresa,$row2['enombre'],$row2['edireccion']);
 					$resp= true;
 				}				
 			

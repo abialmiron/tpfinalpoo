@@ -81,10 +81,7 @@ class ResponsableV{
 		if($base->Iniciar()){
 			if($base->Ejecutar($consultaResp)){
 				if($row2=$base->Registro()){
-				    $this->setNumEmpleado($numEmpleado);
-				    $this->setNumLicencia($row2['rnumerolicencia']);
-					$this->setNombre($row2['rnombre']);
-					$this->setApellido($row2['rapellido']);
+					$this->cargar($numEmpleado,$row2['rnumerolicencia'],$row2['rnombre'],$row2['rapellido']);
 					$resp= true;
 				}				
 			

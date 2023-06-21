@@ -148,14 +148,42 @@ function cargaViaje($objEmpresa){
 }
 
 function cargaResponsable(){
-    $numLic = verificaIngresoInt("Ingrese el número de licencia del responsable: \n");
-    $nombreR = verificaIngreso("Ingrese el nombre del responsable: \n");
-    $apellidoR = verificaIngreso("Ingrese el apellido del responsable: \n");
-    
-    $objResponsable = new ResponsableV();
-    $objResponsable->cargar(0,$numLic,$nombreR,$apellidoR);
-    $objResponsable->insertar();
 
+    $mensaje = "Desea seleccionar un responsable ya cargado o quiere ingresar uno nuevo? \n";
+    $mensaje .= "\n 1) Ya cargado";
+    $mensaje .= "\n 2) Ingresar nuevo \n";
+
+    $ingresoUsuario = verificaIngresoNumerico($mensaje, 1,2);
+
+    if($ingresoUsuario == 1){
+        $objResponsable = new ResponsableV();
+        $colResponsable = $objResponsable->listar("");
+        $numEmpleadoArr = array();
+        if(!empty($colResponsable)){
+            for($i=0;$i<count($colResponsable);$i++){
+                $numEmpleadoArr[] = $colResponsable[$i]->getNumEmpleado();
+                echo $colResponsable[$i];
+            }
+
+            do{
+                $numEmpleado = verificaIngresoInt("Ingrese el num empleado del responsable que desea asignar: \n ");
+                $verificaID = array_search($numEmpleado,$numEmpleadoArr) === false;
+            }while($verificaID);
+            
+            $objResponsable->buscar($numEmpleado);
+
+        }else{
+            echo "No hay responsables cargados";
+        }
+    } else {
+        $numLic = verificaIngresoInt("Ingrese el número de licencia del responsable: \n");
+        $nombreR = verificaIngreso("Ingrese el nombre del responsable: \n");
+        $apellidoR = verificaIngreso("Ingrese el apellido del responsable: \n");
+        
+        $objResponsable = new ResponsableV();
+        $objResponsable->cargar(0,$numLic,$nombreR,$apellidoR);
+        $objResponsable->insertar();
+    }
     return $objResponsable;
 }
 
@@ -445,8 +473,8 @@ function eliminaEmpresa($objEmpresa){
 
 /** MENU PRINCIPAL */
 
-//eliminarBD();
-//DatosDePrueba();
+eliminarBD();
+DatosDePrueba();
 
 $objEmpresa = ingresa_empresa();
 do{
