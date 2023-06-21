@@ -106,11 +106,11 @@ class Pasajero{
 				}				
 			
 		 	}	else {
-		 			$this->setmensajeoperacion($base->getError());
+		 			$this->setMensajeOperacion($base->getError());
 		 		
 			}
 		 }	else {
-		 		$this->setmensajeoperacion($base->getError());
+		 		$this->setMensajeOperacion($base->getError());
 		 	
 		 }		
 		 return $resp;
@@ -150,7 +150,7 @@ class Pasajero{
      * @param string $condicion
 	 * @return $arregloPasajeros
 	 */	
-    public static function listar($condicion=""){
+    public function listar($condicion=""){
 	    $arregloPasajeros = null;
 		$base=new BaseDatos();
 		$consultaPasajeros="Select * from pasajero ";
@@ -177,11 +177,11 @@ class Pasajero{
 				
 			
 		 	}	else {
-		 			$this->setmensajeoperacion($base->getError());
+		 			$this->setMensajeOperacion($base->getError());
 		 		
 			}
 		 }	else {
-		 		$this->setmensajeoperacion($base->getError());
+		 		$this->setMensajeOperacion($base->getError());
 		 	
 		 }	
 		 return $arregloPasajeros;
@@ -230,7 +230,7 @@ class Pasajero{
         'Nombre: ' . $this->getNombre() . "\n" . 
         'Apellido: ' . $this->getApellido(). "\n" . 
         'Telefono: ' . $this->getTelefono() . "\n" .
-        'Viaje: ' . $this->getObjViaje() . "\n";
+    	"Viaje: \n" . $this->getObjViaje()->getCodViaje() . "\n";
     }
 
 }

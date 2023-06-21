@@ -133,8 +133,10 @@ class Viaje{
     public function mostrarPasajeros(){
         $mensaje = '';
         $colPasajeros = $this->getPasajeros();
-        for ($i=0;$i < count($colPasajeros); $i++){
-            $mensaje .= '---------------' . "\n" . $colPasajeros[$i] . "\n";
+        if(count($colPasajeros) > 0){
+            for ($i=0;$i < count($colPasajeros); $i++){
+                $mensaje .= '---------------' . "\n" . $colPasajeros[$i]."\n";
+            }
         }
         return $mensaje;
     }
@@ -174,15 +176,12 @@ class Viaje{
 				    $this->setDestino($row2['vdestino']);
 					$this->setCantMaximaPasajeros($row2['vcantmaxpasajeros']);
 					$this->setCosto($row2['vimporte']);
-                    //$objPasajero = new Pasajero();
-                    $colPasajeros = Pasajero::listar('idviaje ='.$codviaje);
-					$this->setPasajeros($colPasajeros);
                     $objEmpresa = new Empresa();
-                    $empresa = $objEmpresa->buscar($row2['idempresa']);
-                    $this->setEmpresa($empresa);
+                    $objEmpresa->buscar($row2['idempresa']);
+                    $this->setEmpresa($objEmpresa);
                     $objResponsable = new ResponsableV();
-                    $responsable = $objResponsable->buscar($row2['rnumeroempleado']);
-                    $this->setResponsable($responsable);
+                    $objResponsable->buscar($row2['rnumeroempleado']);
+                    $this->setResponsable($objResponsable);
 					$resp= true;
 				}				
 			

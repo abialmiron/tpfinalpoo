@@ -24,6 +24,19 @@
         return $dato;
     }
 
+/** Verifica que se ingrese algo y no quede vacío
+*@param string $stringAMostrar
+*@return $dato 
+*/
+function verificaIngresoInt($stringAMostrar){
+    do{
+        echo $stringAMostrar;
+        $dato = trim(fgets(STDIN));
+    }while(empty($dato) || !is_numeric($dato));
+    return $dato;
+}
+
+
 /** Verifica que se ingrese un número dentro de un rango especificado por el minimo y maximo (parámetros) 
 *@param string $stringAMostrar
 *@param int $min
@@ -53,12 +66,44 @@ function verificaIngresoNumerico($stringAMostrar, $min,$max){
                     $ciclo = true;
                 } else {
                     //Verifica si el pasajero ya fueron pedidos por consola pero no ingresados todavía, para no repetir registros
-                    $existe = recorrePasajeros($dniPasajero,$pasajeros);
-                    if ($existe){
-                        echo 'El DNI ingresado ya se encontraba cargado, intente con otro'. "\n";
-                        $ciclo = true;
+                    if(is_array($pasajeros) && !empty($pasajeros)){
+                        $existe = recorrePasajeros($dniPasajero,$pasajeros);
+                        if ($existe){
+                            echo 'El DNI ingresado ya se encontraba cargado, intente con otro'. "\n";
+                            $ciclo = true;
+                        }
                     }
+                }
+            } else {
+                echo 'No se ingresó un DNI valido, intente nuevamente'. "\n";
+                $ciclo = true;
+            }
+        }while($ciclo);
+        return $dniPasajero;
+    }
+
+    /*Esta función se encarga de que el DNI a seleccionar se encuentre ya en el arreglo
+    @param array $pasajeros son los pasajeros ya cargados
+    @return int $dniPasajero */
+    function verificaDNIYaIngresado($pasajeros){
+        do{
+            $ciclo = true;
+            echo 'Ingrese el DNI del pasajero: ' . "\n";
+            $dniPasajero = trim(fgets(STDIN));
+            if (!is_int($dniPasajero)){
+                //Verifica si se ingresó un dato de 7 u 8 numeros
+                if (verificaFormatoDNI($dniPasajero)){
+                    echo 'El DNI ingresado es invalido, intente nuevamente' . "\n";
+                    $ciclo = true;
+                } else {
+                    //Verifica si el pasajero se encuentra cargado
+                    if(is_array($pasajeros) && !empty($pasajeros)){
+                        $existe = recorrePasajeros($dniPasajero,$pasajeros);
+                        if ($existe){
+                            $ciclo = false;
+                        }
                     }
+                }
             } else {
                 echo 'No se ingresó un DNI valido, intente nuevamente'. "\n";
                 $ciclo = true;

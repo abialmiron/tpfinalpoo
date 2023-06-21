@@ -136,6 +136,33 @@ class ResponsableV{
 		return $resp; 
 	}
 
+	public function listar($condicion=""){
+	    $arregloResp = null;
+		$base=new BaseDatos();
+		$consultaResp="Select * from responsablev";
+		if ($condicion!=""){
+		    $consultaResp=$consultaResp.' where '.$condicion;
+		}
+		$consultaResp.=" order by rnumeroempleado ";
+		if($base->Iniciar()){
+			if($base->Ejecutar($consultaResp)){				
+				$arregloResp= array();
+				while($row2=$base->Registro()){
+                    $objResp = new ResponsableV();
+                    $objResp->buscar($row2['rnumeroempleado']);
+                    array_push($arregloResp,$objResp);
+				}
+		 	}	else {
+		 			$this->setMensajeOperacion($base->getError());
+		 		
+			}
+		 }	else {
+		 		$this->setMensajeOperacion($base->getError());
+		 	
+		 }	
+		 return $arregloResp;
+	}	
+
     public function __toString(){
         return 'Número de empleado: '. $this->getNumEmpleado() . "\n". 
         'Número de licencia: ' . $this->getNumLicencia() . "\n". 
