@@ -279,65 +279,69 @@ function listaPasajeros($objEmpresa){
 }
 
 function modificarViaje($objEmpresa){
+
     $arrCodViajes = listaViajes($objEmpresa);
+    if(!empty($arrCodViajes)){
+        do{
+            $codViaje = verificaIngresoInt("Ingrese el codViaje del viaje con el que quiere trabajar: \n ");
+            $verificaID = array_search($codViaje,$arrCodViajes) === false;
+        }while($verificaID);
 
-    do{
-        $codViaje = verificaIngresoInt("Ingrese el codViaje del viaje con el que quiere trabajar: \n ");
-        $verificaID = array_search($codViaje,$arrCodViajes) === false;
-    }while($verificaID);
+        $objViaje = new Viaje();
+        $objViaje->buscar($codViaje);
 
-    $objViaje = new Viaje();
-    $objViaje->buscar($codViaje);
+        $mensaje = "¿Qué desea modificar del viaje? \n";
+        $mensaje .= "1) Destino \n";
+        $mensaje .= "2) Cantidad Máxima de pasajeros \n";
+        $mensaje .= "3) Asignar otro responsable al viaje \n";
+        $mensaje .= "4) Cambiar la empresa \n";
+        $mensaje .= "5) Costo \n";
 
-    $mensaje = "¿Qué desea modificar del viaje? \n";
-    $mensaje .= "1) Destino \n";
-    $mensaje .= "2) Cantidad Máxima de pasajeros \n";
-    $mensaje .= "3) Asignar otro responsable al viaje \n";
-    $mensaje .= "4) Cambiar la empresa \n";
-    $mensaje .= "5) Costo \n";
+        $modificacion = verificaIngresoNumerico($mensaje, 1,5);
 
-    $modificacion = verificaIngresoNumerico($mensaje, 1,5);
-
-    switch($modificacion){
-        case 1: 
-            $destinoNuevo = verificaIngreso("Ingrese el nuevo destino: \n");
-            $objViaje->setDestino($destinoNuevo);
-            $objViaje->modificar();
-            break;
-        case 2:
-            $cantMaxNueva = verificaIngresoInt("Ingrese la cantidad máxima de pasajeros nueva: \n");
-            $objViaje->setCantMaximaPasajeros($cantMaxNueva);
-            $objViaje->modificar();
-            break;
-        case 3:
-            $respuestaUsuario = verificaIngresoNumerico("¿Desea seleccionar un responsable ya cargado o uno nuevo? \n 1) Ya cargado \n 2) Crear nuevo \n",1,2);
-            if($respuestaUsuario == 1){
-            echo "Lista de responsables cargados: ";
-            $respArray = listaResponsables($objEmpresa);
-            do{
-                $numEmpleadoNuevo = verificaIngresoInt("Ingrese el Num empleado del responsable que desea asignar al viaje: \n ");
-                $verificaID = array_search($numEmpleadoNuevo,$respArray) === false;
-            }while($verificaID);
-            $objResponsable = new Responsable();
-            $objResponsable->buscar($numEmpleadoNuevo);
-            $objViaje->setResponsable($objResponsable);
-            $objResponsable->modificar();
-            } else {
-                $objResponsable = cargaResponsable();
+        switch($modificacion){
+            case 1: 
+                $destinoNuevo = verificaIngreso("Ingrese el nuevo destino: \n");
+                $objViaje->setDestino($destinoNuevo);
+                $objViaje->modificar();
+                break;
+            case 2:
+                $cantMaxNueva = verificaIngresoInt("Ingrese la cantidad máxima de pasajeros nueva: \n");
+                $objViaje->setCantMaximaPasajeros($cantMaxNueva);
+                $objViaje->modificar();
+                break;
+            case 3:
+                $respuestaUsuario = verificaIngresoNumerico("¿Desea seleccionar un responsable ya cargado o uno nuevo? \n 1) Ya cargado \n 2) Crear nuevo \n",1,2);
+                if($respuestaUsuario == 1){
+                echo "Lista de responsables cargados: ";
+                $respArray = listaResponsables($objEmpresa);
+                do{
+                    $numEmpleadoNuevo = verificaIngresoInt("Ingrese el Num empleado del responsable que desea asignar al viaje: \n ");
+                    $verificaID = array_search($numEmpleadoNuevo,$respArray) === false;
+                }while($verificaID);
+                $objResponsable = new Responsable();
+                $objResponsable->buscar($numEmpleadoNuevo);
                 $objViaje->setResponsable($objResponsable);
                 $objResponsable->modificar();
-            }
+                } else {
+                    $objResponsable = cargaResponsable();
+                    $objViaje->setResponsable($objResponsable);
+                    $objResponsable->modificar();
+                }
+                break;
+            case 4: 
+                $nuevaEmpresa = ingresa_empresa();
+                $objViaje->setEmpresa($nuevaEmpresa);
+                $objViaje->modificar();
             break;
-        case 4: 
-            $nuevaEmpresa = ingresa_empresa();
-            $objViaje->setEmpresa($nuevaEmpresa);
-            $objViaje->modificar();
-        break;
-        case 5:
-            $nuevoCosto = verificaIngresoInt("Ingrese el nuevo costo: \n");
-            $objViaje->setCosto($nuevoCosto);
-            $objViaje->modificar();
-        break;
+            case 5:
+                $nuevoCosto = verificaIngresoInt("Ingrese el nuevo costo: \n");
+                $objViaje->setCosto($nuevoCosto);
+                $objViaje->modificar();
+            break;
+        }
+    } else {
+        echo "No hay viajes para modificar \n";
     }
 
 }
@@ -508,13 +512,17 @@ do{
         case 4:
             echo "Se muestran los viajes almacenados: \n";
             $arrCodViajes = listaViajes($objEmpresa);
-            do{
-                $codViaje = verificaIngresoInt("Ingrese el codViaje del viaje que desea eliminar: \n ");
-                $verificaID = array_search($codViaje,$arrCodViajes) === false;
-            }while($verificaID);
+            if(!empty($arrCodViajes)){
+                do{
+                    $codViaje = verificaIngresoInt("Ingrese el codViaje del viaje que desea eliminar: \n ");
+                    $verificaID = array_search($codViaje,$arrCodViajes) === false;
+                }while($verificaID);
 
-            eliminaViaje($codViaje);
-            echo "Se eliminó el viaje";
+                eliminaViaje($codViaje);
+                echo "Se eliminó el viaje";
+            } else {
+                echo "No es posible eliminar viajes ya que no hay viajes \n";
+            }
         break;
         case 5:
             echo "Se muestran los viajes almacenados: \n";
