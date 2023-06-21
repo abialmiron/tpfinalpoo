@@ -60,7 +60,7 @@ class ResponsableV{
 		if($base->Iniciar()){
             $id = $base->devuelveIDInsercion($consultaInsertar);
 			if($id != null){
-			    $resp=  $id;
+				$resp=  true;
                 $this->setNumEmpleado($id);
 			}	else {
 					$this->setMensajeOperacion($base->getError());

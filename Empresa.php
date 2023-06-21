@@ -84,7 +84,7 @@ class Empresa{
 		if($base->Iniciar()){
             $id = $base->devuelveIDInsercion($consultaInsertar);
 			if($id != null){
-			    $resp=  $id;
+				$resp=  true;
 				$this->setIdEmpresa($id);
 			}	else {
 					$this->setMensajeOperacion($base->getError());

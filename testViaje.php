@@ -12,21 +12,25 @@ function eliminarBD(){
     $objViaje = new Viaje();
     $objEmpresa = new Empresa();
     $objResponsable = new ResponsableV();
+    //borro tabla pasajeros
     $tablaPasajeros = $objPasajero->listar("");
     for ($i=0;$i<count($tablaPasajeros);$i++) {
         $tablaPasajeros[$i]->eliminar();
     }
 
+    //borro tabla viaje
     $tablaViajes = $objViaje->listar("");
     for ($i=0;$i<count($tablaViajes);$i++) {
         $tablaViajes[$i]->eliminar();
     }
 
+    //borro tabla empresa
     $tablaEmpresas = $objEmpresa->listar("");
     for ($i=0;$i<count($tablaEmpresas);$i++) {
         $tablaEmpresas[$i]->eliminar();
     }
 
+    //borro tabla responsablev
     $tablaResponsableV = $objResponsable->listar("");
     for ($i=0;$i<count($tablaResponsableV);$i++) {
         $tablaResponsableV[$i]->eliminar();
@@ -35,38 +39,40 @@ function eliminarBD(){
 
  function DatosDePrueba() {
     // Para tener mas variedad, se precargan los siguientes datos: 
-    $objEmpresa = new Empresa();
-    $objEmpresa->cargar(0, "Empresa prueba", "Av Argentina 200");
-    $objEmpresa->insertar();
+    $objEmpresa1 = new Empresa();
+    $objEmpresa1->cargar(0, "Empresa prueba", "Av Argentina 200");
+    $objEmpresa1->insertar();
 
-    $objEmpresa = new Empresa();
-    $objEmpresa->cargar(0, "Otra Empresa", "Roca 1291");
-    $objEmpresa->insertar();
+    $objEmpresa2 = new Empresa();
+    $objEmpresa2->cargar(0, "Otra Empresa", "Roca 1291");
+    $objEmpresa2->insertar();
 
     $objResponsable1 = new ResponsableV();
     $objResponsable1->cargar(0, 8272819, "Silvia", "Ortiz");
     $objResponsable1->insertar();
 
     $objResponsable2 = new ResponsableV();
-    $objResponsable1->cargar(0, 3424324, "Juan", "Almiron");
-    $objResponsable1->insertar();
-
+    $objResponsable2->cargar(0, 3424324, "Juan", "Almiron");
+    $objResponsable2->insertar();
 
     $objViaje1 = new Viaje();
-    $objViaje1->cargar(0, "Paraguay", 25, [],$objResponsable1,4568,$objEmpresa);
-    $objViaje2 = new Viaje();
-    $objViaje2->cargar(0, "Bariloche", 100,[],$objResponsable1,5600,$objEmpresa);
+    $objViaje1->cargar(0, "Paraguay", 25, [],$objResponsable1,4568,$objEmpresa1);
     $objViaje1->insertar();
+
+    $objViaje2 = new Viaje();
+    $objViaje2->cargar(0, "Bariloche", 100,[],$objResponsable2,5600,$objEmpresa1);
     $objViaje2->insertar();
 
     $objPasajero1 = new Pasajero();
     $objPasajero1->cargar(42605438, "Abigail", "Almiron", $objViaje1, 2994555138);
+    $objPasajero1->insertar();
+
     $objPasajero2 = new Pasajero();
     $objPasajero2->cargar(42602323, "Camila", "Almiron", $objViaje1, 299837483);
+    $objPasajero2->insertar();
+
     $objPasajero3 = new Pasajero();
     $objPasajero3->cargar(45234233, "Davor", "Kissner", $objViaje2, 2997387281);
-    $objPasajero1->insertar();
-    $objPasajero2->insertar();
     $objPasajero3->insertar();
 }
 
