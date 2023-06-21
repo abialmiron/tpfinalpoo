@@ -24,7 +24,7 @@ class Viaje{
     }
 
     public function cargar($codViaje,$des, $cantmaxpasajeros, $pas,$res,$cos,$emp){
-        $this->cod_Viaje = $codViaje;
+        $this->cod_viaje = $codViaje;
         $this->destino = $des;
         $this->cantMaximaPasajeros = $cantmaxpasajeros;
         $this->pasajeros = $pas;

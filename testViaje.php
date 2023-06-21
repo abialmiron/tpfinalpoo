@@ -24,17 +24,19 @@ function eliminarBD(){
         $tablaViajes[$i]->eliminar();
     }
 
+    //borro tabla responsablev
+    $tablaResponsableV = $objResponsable->listar("");
+    for ($i=0;$i<count($tablaResponsableV);$i++) {
+        $tablaResponsableV[$i]->eliminar();
+    }
+
     //borro tabla empresa
     $tablaEmpresas = $objEmpresa->listar("");
     for ($i=0;$i<count($tablaEmpresas);$i++) {
         $tablaEmpresas[$i]->eliminar();
     }
 
-    //borro tabla responsablev
-    $tablaResponsableV = $objResponsable->listar("");
-    for ($i=0;$i<count($tablaResponsableV);$i++) {
-        $tablaResponsableV[$i]->eliminar();
-    }
+    
 }
 
  function DatosDePrueba() {
@@ -241,7 +243,8 @@ function cargaPasajerosYaIniciada($objViaje){
 }
 
 function listaViajes($objEmpresa){
-    $colViajes = Viaje::listar("idempresa = ".$objEmpresa->getIdEmpresa());
+    $objViaje = new Viaje();
+    $colViajes = $objViaje->listar("idempresa = ".$objEmpresa->getIdEmpresa());
     $arrCodViajes = array();
     for($i = 0;$i < count($colViajes);$i++){
         $arrCodViajes[] = $colViajes[$i]->getCodViaje();
@@ -466,14 +469,16 @@ function modificaEmpresa($idEmpresaMod){
     return $objEmpresa;
 }
 
-function eliminaEmpresa($objEmpresa){
-    $idEmpresa = $objEmpresa->getIdEmpresa();
+function eliminaEmpresa($idEmpresaElim){
     $objViaje = new Viaje();
-    $colViajes = $objViaje->listar("idempresa = ".$idEmpresa);
+    $colViajes = $objViaje->listar("idempresa = ".$idEmpresaElim);
     if(!empty($colViajes)){
         echo "No puede eliminar la empresa, un/unos viaje/s se encuentra/n utilizandola";
     } else {
+        $objEmpresa = new Empresa();
+        $objEmpresa->buscar($idEmpresaElim);
         $objEmpresa->eliminar();
+        echo "Se eliminó la empresa correctamente \n";
     }
 }
 
@@ -578,7 +583,7 @@ do{
             $idEmpresasArr = listarEmpresas();
             do{
                 $idEmpresaElim = verificaIngresoInt("Ingrese el Id de la empresa que desea eliminar: \n ");
-                $verificaID = array_search($idEmpresaMod,$idEmpresasArr) === false;
+                $verificaID = array_search($idEmpresaElim,$idEmpresasArr) === false;
             }while($verificaID);
 
             if($idEmpresaElim == $objEmpresa->getIdEmpresa()){
