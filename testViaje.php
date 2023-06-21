@@ -7,7 +7,7 @@ include_once "ResponsableV.php";
 include_once "Pasajero.php";
 include_once "funcionesGenerales.php";
 
-/*function eliminarBD(){
+function eliminarBD(){
     $objPasajero = new Pasajero();
     $objViaje = new Viaje();
     $objEmpresa = new Empresa();
@@ -68,7 +68,7 @@ include_once "funcionesGenerales.php";
     $objPasajero1->insertar();
     $objPasajero2->insertar();
     $objPasajero3->insertar();
-}*/
+}
 
 function menu_principal(){
 
