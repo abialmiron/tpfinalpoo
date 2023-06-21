@@ -345,7 +345,7 @@ function modificarViaje($objEmpresa){
 function eliminaViaje($codViaje){
     $objViaje = new Viaje();
     $objViaje->buscar($codViaje);
-    $objViaje->traerPasajeros();
+    $objViaje->traePasajeros();
     $colPasajeros = $objViaje->getPasajeros();
 
     for($i=0;$i<count($colPasajeros);$i++){
@@ -514,6 +514,7 @@ do{
             }while($verificaID);
 
             eliminaViaje($codViaje);
+            echo "Se eliminó el viaje";
         break;
         case 5:
             echo "Se muestran los viajes almacenados: \n";
@@ -531,20 +532,29 @@ do{
         case 6: 
             echo '*** Modificacion de pasajero ***' . "\n";
             $colPasajeros = listaPasajeros($objEmpresa);
+            if(!empty($colPasajeros)){
             $dniAModificar = verificaDNIYaIngresado($colPasajeros);
 
             modificaPasajeros($dniAModificar, $objEmpresa);
+            } else {
+                echo "No hay pasajeros para modificar \n";
+            }
         break;
         case 7:
             echo '*** Eliminacion de pasajero ***'. "\n";
             $colPasajeros = listaPasajeros($objEmpresa);
+            if(!empty($colPasajeros)){
             $dniAEliminar = verificaDNIYaIngresado($colPasajeros);
             $objPasajero = new Pasajero();
             $objPasajero->buscar($dniAEliminar);
             $objPasajero->eliminar();
+            } else {
+                echo "No hay pasajeros para eliminar \n";
+            }
         break;
         case 8:
             $colNumEmpleadoRes = listaResponsables($objEmpresa);
+            if(!empty($colNumEmpleadoRes)){
             do{
                 $numEmpleado = verificaIngresoInt("Ingrese el Num empleado del responsable al que desea modificar: \n ");
                 $verificaID = array_search($numEmpleado,$colNumEmpleadoRes) === false;
@@ -554,9 +564,13 @@ do{
             $objResponsable->buscar($numEmpleado);
 
             modificaResponsable($objResponsable);
+            } else {
+                echo "No es posible modificar responsables ya que no hay cargados \n";
+            }
         break;
         case 9:
             $colNumEmpleadoRes = listaResponsables($objEmpresa);
+            if(!empty($colNumEmpleadoRes)){
             do{
                 $numEmpleado = verificaIngresoInt("Ingrese el Num empleado del responsable al que desea eliminar: \n ");
                 $verificaID = array_search($numEmpleado,$colNumEmpleadoRes) === false;
@@ -565,6 +579,9 @@ do{
             $objResponsable = new ResponsableV();
             $objResponsable->buscar($numEmpleado);
             eliminaResponsable($objResponsable);
+            } else {
+                echo "No hay responsables para eliminar \n";
+            }
         break;
         case 10:
             $idEmpresasArr = listarEmpresas();
@@ -587,7 +604,7 @@ do{
             }while($verificaID);
 
             if($idEmpresaElim == $objEmpresa->getIdEmpresa()){
-                echo "No puede eliminar la empresa que está utilizando";
+                echo "No puede eliminar la empresa que está utilizando \n";
             } else {
                 eliminaEmpresa($idEmpresaElim);
             }
